@@ -1,6 +1,4 @@
 # Create a GitHub action to email a report from a file at 6 a.m. daily.
-# The report is created by the deploy-app.yaml file
-
 name: Email Report
 
 on:
@@ -8,10 +6,21 @@ on:
     - cron: '0 6 * * *'
 
 jobs:
-  email_report:
+  email:
     runs-on: ubuntu-latest
     steps:
-    - name: Email the report
-      run: |
-        echo "Hello, this is the report" > report.txt
-        mail -s "Daily report"
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Email report
+        uses: dawidd6/action-send-mail@v2
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL }}
+          password: ${{ secrets.PASSWORD }}
+          subject: 'Daily Report'
+          body: 'Please find the daily report attached.'
+          to: ${{ secrets.RECIPIENT }}
+          attachments: 'report.txt'
+```
